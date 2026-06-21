@@ -38,6 +38,35 @@ SSH_OPTS="-o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new"
 
 ---
 
+## Preflight — local checkout (run FIRST; fail before touching a server)
+
+The installer builds from a local **KBDE-KyberAgent-Enterprise** checkout, and the
+Open Design runtime is shipped from a **built payload** inside it. Verify both up
+front — don't provision a server you'd have to redo.
+
+```bash
+REPO=/path/to/KBDE-KyberAgent-Enterprise        # the user's checkout
+# (a) it's a real KBDE checkout with the installer:
+test -f "$REPO/deploy/remote-vps/install.sh" || { echo "✗ Not a KBDE checkout: $REPO"; exit 1; }
+# (b) the Open Design payload is present (a built artifact, not committed):
+OD="$REPO/apps/desktop/resources/apps/daemon"
+if [ ! -d "$OD/dist" ] || [ ! -d "$OD/node_modules" ]; then
+  echo "✗ Open Design payload missing at: $OD  (need dist/ + node_modules/)"
+  echo "  It's produced by the desktop's Open Design bundling step — build it into"
+  echo "  the checkout first (see the KYBERAGENT_OD_SOURCE … bundle-open-design.cjs"
+  echo "  step in $REPO/deploy/remote-vps/scripts/install-host.sh), then re-run deploy."
+  exit 1
+fi
+# (c) local tools to ship + drive the box:
+for t in ssh rsync; do command -v $t >/dev/null || { echo "✗ missing local tool: $t"; exit 1; }; done
+echo "✓ preflight OK — checkout, Open Design payload, and local tooling present"
+```
+
+If (b) fails, **STOP** and have the user build the desktop (which bundles Open
+Design) before continuing — every later step depends on that payload.
+
+---
+
 ## 0. SSH access (resolve the operator's key — do NOT hardcode a path)
 
 ```bash
