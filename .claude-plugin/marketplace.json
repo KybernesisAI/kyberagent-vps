@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "kybernesis",
+  "owner": {
+    "name": "KybernesisAI",
+    "email": "ian@darkstarvc.com"
+  },
+  "description": "Kybernesis plugins for Claude Code.",
+  "plugins": [
+    {
+      "name": "kyberagent-vps",
+      "source": "./plugins/kyberagent-vps",
+      "description": "Deploy and operate a KyberAgent cloud agent on a VPS — install, health, agent create/list/remove, release updates, Docker/env verification, Arcana cloud-brain connect, and desktop pairing. One skill per task.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "category": "devops",
+      "keywords": ["kyberagent", "vps", "agent-ops", "devops", "tailscale", "arcana"]
+    }
+  ]
+}
