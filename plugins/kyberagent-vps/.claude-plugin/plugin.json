@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "kyberagent-vps",
   "displayName": "KyberAgent VPS",
-  "version": "0.1.1",
-  "description": "Deploy and operate a KyberAgent cloud agent on a VPS — install, health checks, agent create/list/remove, release updates, Docker/env verification, Arcana cloud-brain connect, and desktop pairing. One skill per task.",
+  "version": "0.1.2",
+  "description": "Deploy and operate a KyberAgent cloud agent on a VPS \u2014 install, health checks, agent create/list/remove, release updates, Docker/env verification, Arcana cloud-brain connect, and desktop pairing. One skill per task.",
   "author": {
     "name": "KybernesisAI",
     "url": "https://github.com/KybernesisAI"
@@ -11,5 +11,13 @@
   "homepage": "https://github.com/KybernesisAI/kyberagent-vps",
   "repository": "https://github.com/KybernesisAI/kyberagent-vps",
   "license": "MIT",
-  "keywords": ["kyberagent", "vps", "agent-ops", "devops", "digitalocean", "tailscale", "arcana"]
+  "keywords": [
+    "kyberagent",
+    "vps",
+    "agent-ops",
+    "devops",
+    "digitalocean",
+    "tailscale",
+    "arcana"
+  ]
 }

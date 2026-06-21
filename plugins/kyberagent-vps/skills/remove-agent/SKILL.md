@@ -11,14 +11,12 @@ home dir** — it's irreversible (local brain + identity). Never remove `orchest
 
 ## 1. Connect
 ```bash
-VPS="$(cat ~/.config/kyberagent-vps/host 2>/dev/null)"   # saved on first use
-# If $VPS is empty: ask the user for their KyberAgent box's host — its Tailscale
-# name or public IP. They got it from the `deploy` skill's final output, or it's
-# the droplet IP in their cloud dashboard / the machine in their Tailscale admin.
-# Then save it so no skill asks again:
-#   mkdir -p ~/.config/kyberagent-vps && printf %s "<host>" > ~/.config/kyberagent-vps/host
-# (If kssh later fails with "Permission denied", their SSH key isn't authorized on
-# the box as root — root SSH access is required; the deploy skill sets this up.)
+VPS="$(cat ~/.config/kyberagent-vps/host 2>/dev/null)"
+# ↑ The saved host. If it is NON-EMPTY, USE IT and continue — do NOT ask the user.
+# ONLY if it is empty: ask for the box's Tailscale name or IP (from the `deploy`
+# output, the cloud dashboard, or the Tailscale admin), then save it so nothing
+# asks again:  mkdir -p ~/.config/kyberagent-vps && printf %s "<host>" > ~/.config/kyberagent-vps/host
+# ("Permission denied" from kssh = your SSH key isn't root-authorized on the box.)
 AGENT=<name>
 kssh() { ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new root@"$VPS" "$@"; }
 BEARER=$(kssh "grep '^KYBERAGENT_DAEMON_TOKEN=' /etc/kyberagent/remote.env | cut -d= -f2-")
