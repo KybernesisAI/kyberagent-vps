@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "kyberagent-vps",
   "displayName": "KyberAgent VPS",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deploy and operate a KyberAgent cloud agent on a VPS — install, health checks, agent create/list/remove, release updates, Docker/env verification, Arcana cloud-brain connect, and desktop pairing. One skill per task.",
   "author": {
     "name": "KybernesisAI",

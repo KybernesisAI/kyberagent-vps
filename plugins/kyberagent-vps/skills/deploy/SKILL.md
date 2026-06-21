@@ -238,6 +238,12 @@ Print these for the desktop app → AGENTS → **⊕ ADD REMOTE → MANUAL PEER*
 (Open Design + Live Artifacts URLs/bearers from `/etc/kyberagent/pairing.json`
 go in the app's Design / Live Artifacts runtime settings — optional.)
 
+Then **save the host** so the day-2 ops skills (`health-check`, `create-agent`,
+`list-agents`, …) reuse it without re-asking:
+```bash
+mkdir -p ~/.config/kyberagent-vps && printf %s "$TS_DNS" > ~/.config/kyberagent-vps/host
+```
+
 ---
 
 ## Gotchas (each cost real debugging the first time)

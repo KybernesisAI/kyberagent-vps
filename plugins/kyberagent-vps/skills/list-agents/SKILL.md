@@ -11,7 +11,14 @@ you don't have it.
 
 ## 1. Connect
 ```bash
-VPS=<ip-or-tailnet-host>
+VPS="$(cat ~/.config/kyberagent-vps/host 2>/dev/null)"   # saved on first use
+# If $VPS is empty: ask the user for their KyberAgent box's host — its Tailscale
+# name or public IP. They got it from the `deploy` skill's final output, or it's
+# the droplet IP in their cloud dashboard / the machine in their Tailscale admin.
+# Then save it so no skill asks again:
+#   mkdir -p ~/.config/kyberagent-vps && printf %s "<host>" > ~/.config/kyberagent-vps/host
+# (If kssh later fails with "Permission denied", their SSH key isn't authorized on
+# the box as root — root SSH access is required; the deploy skill sets this up.)
 kssh() { ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new root@"$VPS" "$@"; }
 BEARER=$(kssh "grep '^KYBERAGENT_DAEMON_TOKEN=' /etc/kyberagent/remote.env | cut -d= -f2-")
 api() { kssh "curl -s -m12 -H 'Authorization: Bearer $BEARER' $*"; }
@@ -20,10 +27,18 @@ api() { kssh "curl -s -m12 -H 'Authorization: Bearer $BEARER' $*"; }
 ## 2. List
 ```bash
 api http://127.0.0.1:8765/agents | python3 -c 'import sys,json
-for a in json.load(sys.stdin):
-    print(f"{a[\"name\"]:14} kind={a.get(\"kind\",\"local\")} backend={a.get(\"memory_backend\") or \"local\"} workspace={a.get(\"cloud_workspace\")}")'
+rows=json.load(sys.stdin)
+print("%-14s %-8s %-7s %s" % ("AGENT","KIND","BACKEND","WORKSPACE"))
+for a in rows:
+    print("%-14s %-8s %-7s %s" % (a["name"], a.get("kind","local"), a.get("memory_backend") or "local", a.get("cloud_workspace") or "-"))'
 ```
 Or via the CLI: `kssh "sudo -iu KyberAgent kyberagent agents"`.
+
+> Note: the `python3 -c` runs **locally** (after the pipe), so it's inside a
+> single-quoted block — use plain `"` for dict keys and avoid f-strings with
+> nested quotes (use `%`-formatting). When a `python3 -c` runs **on the box**
+> inside `kssh "…"`, the inner quotes must be escaped (`\"`) to survive the outer
+> double-quote — see the create-agent / remove-agent skills.
 
 `orchestrator` is the built-in agent; named agents (e.g. `ava`) are the ones the
 user created. To add one use the **create-agent** skill; for the values to pair
