@@ -11,7 +11,7 @@
       "name": "kyberagent-vps",
       "source": "./plugins/kyberagent-vps",
       "description": "Deploy and operate a KyberAgent cloud agent on a VPS \u2014 install, health, agent create/list/remove, release updates, Docker/env verification, Arcana cloud-brain connect, and desktop pairing. One skill per task.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "category": "devops",
       "keywords": [

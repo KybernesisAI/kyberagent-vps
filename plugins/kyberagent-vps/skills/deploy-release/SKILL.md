@@ -53,25 +53,44 @@ test -d "$REPO/apps/desktop/resources/apps/daemon/dist" \
 ```
 
 ## 3. Sync the release source to the box
+> **Never re-run `install.sh` for an update.** The installer regenerates the
+> daemon / Open Design / Live Artifacts **tokens**, which breaks every paired
+> client (this is what caused an OD bearer drift before). Sync source + rebuild
+> in place instead.
 ```bash
-rsync -az --delete --exclude node_modules --exclude dist --exclude .git \
+# packages source (delete stale; keep the box's node_modules + dist + tsbuildinfo):
+rsync -az --delete --exclude node_modules --exclude dist --exclude '*.tsbuildinfo' \
   -e "ssh -o ConnectTimeout=20" "$REPO/packages/" root@"$VPS":/opt/kyberagent/app/packages/
-# Open Design payload — re-ship only if the release changed it (carries its own dist + node_modules):
-rsync -az -e "ssh -o ConnectTimeout=20" "$REPO/apps/desktop/resources/apps/daemon/" \
-  root@"$VPS":/opt/kyberagent/app/apps/desktop/resources/apps/daemon/
+# root build-config — REQUIRED so `pnpm install` resolves the release's deps:
+printf '%s\n' package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json | \
+  rsync -az --files-from=- -e "ssh -o ConnectTimeout=20" "$REPO/" root@"$VPS":/opt/kyberagent/app/
 ```
+> Open Design is a **separate bundled payload** (`apps/desktop/resources/apps/daemon`).
+> A normal release leaves it as-is — only re-ship + rebuild it if the release
+> actually changed OD (and remember its `node_modules`/`dist` are needed).
 
 ## 4. Rebuild on the box (Linux-native) + restart
 ```bash
-kssh "chown -R KyberAgent:KyberAgent /opt/kyberagent/app/packages /opt/kyberagent/app/apps"
-kssh "sudo -iu KyberAgent bash -lc 'cd /opt/kyberagent/app && pnpm install && pnpm -r build \
+kssh "chown -R KyberAgent:KyberAgent /opt/kyberagent/app/packages \
+  /opt/kyberagent/app/package.json /opt/kyberagent/app/pnpm-lock.yaml \
+  /opt/kyberagent/app/pnpm-workspace.yaml /opt/kyberagent/app/.npmrc /opt/kyberagent/app/tsconfig.base.json"
+kssh "sudo -iu KyberAgent bash -lc 'cd /opt/kyberagent/app \
+  && pnpm install \
   && pnpm --filter @kyberagent/daemon build:bundle \
   && pnpm --filter @kyberagent/cli build \
   && pnpm --filter @kyberagent/live-artifacts-daemon build'"
-kssh "systemctl restart kyberagent-daemon kyberagent-live-artifacts open-design-daemon"
+kssh "systemctl restart kyberagent-daemon kyberagent-live-artifacts"
 ```
-> `pnpm install` recompiles native deps (`better-sqlite3`, `sqlite-vec`, `@libsql`)
-> for Linux. The daemon restart bounces all agents for a few seconds.
+> - **Scoped builds only.** `build:bundle` is esbuild bundling straight from
+>   source — do **NOT** run `pnpm -r build` (it would try to build the Electron
+>   desktop on the box and fail). Build the daemon bundle + CLI + Live Artifacts only.
+> - `pnpm install` recompiles native deps (`better-sqlite3`, `sqlite-vec`, `@libsql`)
+>   for Linux; a harmless `prepare: not in a git directory` warning is expected
+>   (`/opt/kyberagent/app` isn't a git repo).
+> - The daemon restart bounces all agents for a few seconds. **Open Design is not
+>   rebuilt here, so don't restart it.** Confirm the new bundle by its size/mtime
+>   (`ls …/dist/kyberagent-daemon.mjs`) — the `/health` `version` field stays a
+>   hardcoded `0.1.0-alpha` and does **not** reflect the release.
 
 ## 5. Pull the matching environment image (Docker work-envs)
 ```bash
