@@ -47,7 +47,8 @@ You can also invoke a skill directly as `/kyberagent-vps:<skill>`.
 | `create-agent` | Create a named agent, verify it, hand back desktop-pairing values, optionally connect Arcana. |
 | `list-agents` | List agents with kind / memory backend / workspace. |
 | `connect-desktop` | Fetch the bearer token + peer URL + port to pair an agent into the desktop app. |
-| `update-build` | Deploy a new release — sync source, rebuild the right artifact (daemon bundle / CLI / Live Artifacts), restart. |
+| `deploy-release` | Deploy an **official tagged release** (e.g. `0.1.10-alpha`) — checkout the tag, rebuild the host daemon/CLI/LA/OD on the box, restart, and pull the matching GHCR env image. |
+| `update-build` | Ad-hoc **dev-file sync** (not a tagged release) — push changed source, rebuild the right artifact (daemon bundle / CLI / Live Artifacts), restart. |
 | `check-docker` | Verify + fix the Docker + environment-image chain for remote work-environments. |
 | `connect-arcana` | Move an agent's brain to Arcana cloud via the headless device flow (or disconnect). |
 | `remove-agent` | Disconnect cloud, unregister, optionally delete the home (never `orchestrator`). |
