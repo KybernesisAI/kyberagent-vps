@@ -1,6 +1,6 @@
 ---
-name: deploy-release
-description: Deploy an official tagged KyberAgent release (e.g. 0.1.10-alpha) to an existing VPS — check out the release tag, rebuild the host daemon/CLI/Live Artifacts/Open Design on the box, restart the services, and pull the matching GHCR environment image for Docker work-envs. Use when the user asks to "update the VPS to the latest release", "deploy 0.1.x-alpha to the box", "bump the server to the new release and env image", or "push the tagged release to the VPS". For ad-hoc dev-file syncs that aren't a tagged release, use update-build instead.
+name: update-release
+description: Update an existing KyberAgent VPS to an official tagged release. Deploy a tagged build (e.g. 0.1.10-alpha) to an existing VPS — check out the release tag, rebuild the host daemon/CLI/Live Artifacts/Open Design on the box, restart the services, and pull the matching GHCR environment image for Docker work-envs. Use when the user asks to "update the VPS to the latest release", "deploy 0.1.x-alpha to the box", "bump the server to the new release and env image", or "push the tagged release to the VPS". For ad-hoc dev-file syncs that aren't a tagged release, use update-build instead.
 allowed-tools: Bash, Read
 ---
 
